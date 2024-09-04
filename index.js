@@ -23,7 +23,8 @@ module.exports = class extends mofron.class.Event {
 
             this.confmng().add("clickFlag", { type: "boolean", init: false });
             this.confmng().add("status", { type: "boolean", init: false });
-            
+            this.confmng().add('ignore', { type:'object' });
+
 	    if (undefined !== prm) {
                 this.config(prm);
             }
@@ -54,8 +55,18 @@ module.exports = class extends mofron.class.Event {
                 false
             );
 
-            let win_clk = () => {
+            let win_clk = (w1,w2,w3) => {
                 try {
+                    let ign = evt.ignore();
+                    if (null !== ign) {
+                        let rdom = ign.rootDom();
+                        for (let ridx in rdom) {
+                            if (rdom[ridx].getRawDom().contains(w2.target)) {
+                                return;
+	                    }
+                        }
+                    }
+
                     if ( (true === evt.status()) &&
                          (false === evt.clickFlag()) ) {
                         evt.execListener(false);
@@ -76,6 +87,15 @@ module.exports = class extends mofron.class.Event {
             console.error(e.stack);
             throw e;
         }
+    }
+
+    ignore (prm) {
+        try {
+            return this.confmng('ignore', prm);
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+	}
     }
 
     /**
